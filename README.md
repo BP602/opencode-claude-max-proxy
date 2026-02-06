@@ -77,6 +77,17 @@ bun install
 
 ## Usage
 
+### Recommended: Shell aliases
+
+Add these to your shell config (`~/.zshrc` or `~/.bashrc`):
+
+```bash
+alias oc='CLAUDE_PROXY_WORKDIR="$PWD" bun run "$HOME/opencode-claude-max-proxy/bin/claude-proxy.ts" & p=$!; ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://127.0.0.1:3456 opencode; kill "$p" 2>/dev/null'
+```
+
+Run `oc` from your project directory to start both proxy and OpenCode. This works in both bash and zsh.
+If you cloned the repo elsewhere, replace `$HOME/opencode-claude-max-proxy` with your actual clone path.
+
 ### Start the Proxy
 
 ```bash
@@ -94,7 +105,7 @@ Select any `anthropic/claude-*` model (opus, sonnet, haiku).
 ### One-liner
 
 ```bash
-bun run proxy & ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://127.0.0.1:3456 opencode
+CLAUDE_PROXY_WORKDIR="$PWD" bun run "$HOME/opencode-claude-max-proxy/bin/claude-proxy.ts" & p=$!; ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://127.0.0.1:3456 opencode; kill "$p" 2>/dev/null
 ```
 
 ## Auto-start on macOS
@@ -131,7 +142,7 @@ launchctl load ~/Library/LaunchAgents/com.claude-max-proxy.plist
 Then add an alias to `~/.zshrc`:
 
 ```bash
-echo "alias oc='ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://127.0.0.1:3456 opencode'" >> ~/.zshrc
+echo "alias oc='CLAUDE_PROXY_WORKDIR=\"\$PWD\" bun run \"\$HOME/opencode-claude-max-proxy/bin/claude-proxy.ts\" & p=\$!; ANTHROPIC_API_KEY=dummy ANTHROPIC_BASE_URL=http://127.0.0.1:3456 opencode; kill \"\$p\" 2>/dev/null'" >> ~/.zshrc
 source ~/.zshrc
 ```
 
@@ -152,6 +163,9 @@ Now just run `oc` to start OpenCode with Claude Max.
 | `CLAUDE_PROXY_PORT` | 3456 | Proxy server port |
 | `CLAUDE_PROXY_HOST` | 127.0.0.1 | Proxy server host |
 | `CLAUDE_PROXY_WORKDIR` | (process cwd) | Base working directory used by MCP file/shell tools |
+| `CLAUDE_PROXY_IDLE_TIMEOUT_SECONDS` | 120 | Bun server idle timeout for long streaming responses |
+| `OPENCODE_CLAUDE_PROVIDER_DEBUG` | unset | Enable baseline proxy diagnostics logs |
+| `OPENCODE_CLAUDE_PROVIDER_STREAM_DEBUG` | unset | Enable verbose stream-level debug logs |
 
 ## How It Works
 
